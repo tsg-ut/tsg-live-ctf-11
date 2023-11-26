@@ -1,0 +1,13 @@
+version: "3"
+services:
+  app:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      - DATADIR=/data
+    volumes:
+      - ./data:/data
+    ports:
+      - '8081:8081'

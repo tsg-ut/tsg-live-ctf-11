@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap" rel="stylesheet" />
+  <title>Notes</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+
+      background: forestgreen;
+      color: white;
+      font-family: 'Raleway';
+      font-size: 2vmin;
+    }
+
+    h1 {
+      font-size: 8vmin;
+      line-height: 1em;
+      margin: 0;
+    }
+
+    p {
+      line-height: 1em;
+    }
+
+    #result {
+      color: gold;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Simple note!</h1>
+  <form id="form" oninput="result.textContent = ''">
+    <input name="post" type="text" />
+    <button type="submit">Send note</button>
+  </form>
+  <p id="result"></p>
+  <script>
+    const getID = (url) => {
+      const segments = url.split('/');
+      return segments.pop();
+    }
+    window.onload = async () => {
+      if (window.location.pathname.startsWith("/view/note/")) {
+        const id = getID(window.location.href);
+        const res = await fetch('/note/' + id, {
+          method: 'GET',
+        });
+        result.textContent = await res.text();
+      }
+    }
+    form.onsubmit = async (event) => {
+      event.preventDefault();
+      const data = new FormData(form).get('post');
+      const res = await fetch('/note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data }),
+      });
+      result.textContent = await res.text();
+      const id = getID(res.url);
+      const url = window.location.origin + '/view/note/' + id;
+      history.pushState({ page: 1 }, "note", url);
+    };
+  </script>
+  <a href="/id">get id!</a>
+</body>
+
+</html>
